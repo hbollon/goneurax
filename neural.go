@@ -29,6 +29,20 @@ func (p *Perceptron) init() { //Random Initialization
 }
 
 // Forward propagation function
-func (p *Perceptron) forwordPass(x []float64) (sum float64) {
+func (p *Perceptron) forwardPass(x []float64) (sum float64) {
 	return sig.activate(vectProduct(p.weights, x) + p.bias)
+}
+
+// Calculate and return gradients of Perceptron weights
+// wi = wi - (α * θloss/θwi)
+func (p *Perceptron) gradWeights(x []float64, y float64) []float64 {
+	pred := p.forwardPass(x)
+	return vectMatProduct(-(pred-y)*pred*(1-pred), x)
+}
+
+// Calculate and return gradient of Perceptron bias
+// b = b - (α * θloss/θb)
+func (p *Perceptron) gradBias(x []float64, y float64) float64 {
+	pred := p.forwardPass(x)
+	return -(pred - y) * pred * (1 - pred)
 }
