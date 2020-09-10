@@ -1,4 +1,4 @@
-package goneurax
+package main
 
 import (
 	"math/rand"
@@ -33,6 +33,8 @@ func (p *Perceptron) forwardPass(x []float64) (sum float64) {
 	return sig.activate(vectProduct(p.weights, x) + p.bias)
 }
 
+// TODO : Add learning rate to gradients
+
 // Calculate and return gradients of Perceptron weights
 // wi = wi - (α * θloss/θwi)
 func (p *Perceptron) gradWeights(x []float64, y float64) []float64 {
@@ -45,4 +47,20 @@ func (p *Perceptron) gradWeights(x []float64, y float64) []float64 {
 func (p *Perceptron) gradBias(x []float64, y float64) float64 {
 	pred := p.forwardPass(x)
 	return -(pred - y) * pred * (1 - pred)
+}
+
+// Perceptron training function
+func (p *Perceptron) train() {
+	for i := 0; i < p.epochs; i++ {
+		// Declare variables for futures new weights and bias
+		dw := make([]float64, len(p.input[0]))
+		db := 0.0
+		// Iterate through Perceptron input and calculate their weights and bias gradients using Chain Rule
+		for length, val := range p.input {
+			dw = vectAdd(dw, p.gradWeights(val, p.actualOutput[length]))
+			db += p.gradBias(val, p.actualOutput[length])
+		}
+		p.weights = vectAdd(p.weights, vectMatProduct(2/float64(len(p.actualOutput)), dw))
+		p.bias += db * 2 / float64(len(p.actualOutput))
+	}
 }
